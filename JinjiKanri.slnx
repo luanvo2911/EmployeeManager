@@ -1,7 +1,0 @@
-<Solution>
-  <Project Path="JinjiKanri.Base/JinjiKanri.Base.csproj" />
-  <Project Path="JinjiKanri.Common/JinjiKanri.Common.csproj" />
-  <Project Path="JinjiKanri.Domain/JinjiKanri.Domain.csproj" />
-  <Project Path="JinjiKanri.Entity/JinjiKanri.Entity.csproj" />
-  <Project Path="JinjiKanri.WebAPI/JinjiKanri.WebAPI.csproj" />
-</Solution>

@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "EmployeeManager.Base": {
+      "commandName": "Project"
+    },
+    "Profile 1": {
+      "commandName": "Executable",
+      "executablePath": "EmployeeManager.WebAPI"
+    }
+  }
+}

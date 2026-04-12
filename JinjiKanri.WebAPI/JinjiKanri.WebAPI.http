@@ -1,8 +1,0 @@
-@JinjiKanri.WebAPI_HostAddress = http://localhost:5146
-
-GET {{JinjiKanri.WebAPI_HostAddress}}/api/employees/
-Accept: application/json
-
-
-
-###

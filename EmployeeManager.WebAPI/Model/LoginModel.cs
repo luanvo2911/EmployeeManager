@@ -1,0 +1,10 @@
+﻿namespace EmployeeManager.WebAPI.Model
+{
+    public class LoginModel
+    {
+        public string userName { get; set; }
+        public string password { get; set; }
+        public string email { get; set; }
+        public string userRole { get; set; }
+    }
+}
