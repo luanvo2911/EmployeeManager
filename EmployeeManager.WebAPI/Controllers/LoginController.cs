@@ -3,6 +3,7 @@ using EmployeeManager.Common.Encryption;
 using EmployeeManager.Domain.Services.Interface;
 using EmployeeManager.Entity.Entities;
 using EmployeeManager.WebAPI.Model;
+using EmployeeManager.Common.ResourceUtils;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -41,7 +42,7 @@ namespace EmployeeManager.WebAPI.Controllers
 
                 if (loginModel == null)
                 {
-                    return Unauthorized("Invalid username or password.");
+                    return Unauthorized(Message.RES0004);
                 }
                 else
                 {
@@ -49,7 +50,7 @@ namespace EmployeeManager.WebAPI.Controllers
                     var JWTKey = _configuration.GetSection("JsonWebToken:SecretKey").Value;
                     if (JWTKey == null)
                     {
-                        throw new NullReferenceException("JWT Secret Key is not configured.");
+                        throw new NullReferenceException(Message.RES0005);
                     }
 
                     var JWTByteKey = Encoding.ASCII.GetBytes(JWTKey);

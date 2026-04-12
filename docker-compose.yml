@@ -1,0 +1,44 @@
+services:
+  # SQL Server service used as the database for the WebAPI during local development
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest # Use Microsoft's official SQL Server Linux image
+    container_name: employee_manager_sql # Fixed container name for easier local management
+    environment: # Environment variables passed to the container
+      SA_PASSWORD: "Your_strong_P@ssw0rd" # sa (system administrator) password - replace with a secure secret in real use
+      ACCEPT_EULA: "Y" # Required by the image to accept the license
+    ports:
+      # Map a host port to the container's SQL Server port (1433). If you already
+      # run a local SQL Server instance on the host, mapping host 1433 will conflict.
+      # Use a different host port (14330) to avoid conflict and allow SSMS to connect
+      # to localhost,14330.
+      - "14330:1433" # Map host port 14330 -> container port 1433
+    volumes:
+      - sqlserver-data:/var/opt/mssql # Persist SQL Server data on a named Docker volume
+    healthcheck: # Ensure the SQL Server container is healthy before starting dependent services
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P $${SA_PASSWORD} -Q \"SELECT 1\""]
+      interval: 10s # How often to run the health check
+      timeout: 5s # How long to wait for the health check command to succeed
+      retries: 10 # How many retries before marking container unhealthy
+
+  # Web API service that runs the ASP.NET Core application
+  webapi:
+    build:
+      context: . # Build context root (repository root) so Dockerfile can access project files
+      dockerfile: EmployeeManager.WebAPI/Dockerfile # Path to the Dockerfile for the Web API
+    container_name: employee_manager_webapi # Fixed container name for the Web API
+    depends_on:
+      - sqlserver # Start SQL Server before attempting to start the Web API
+    environment: # Environment variables for the Web API process
+      - ASPNETCORE_ENVIRONMENT=Development # Set ASP.NET environment (Development/Production)
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=EmployeeManagerDb;User Id=sa;Password=Your_strong_P@ssw0rd;TrustServerCertificate=True; # Connection string that targets the sqlserver service defined in this compose file
+      - JsonWebToken__SecretKey=This-Is-My-Local-Secret-Key-1234567890 # Secret key used by JWT authentication (replace with a secure secret)
+    ports:
+      - "5000:80" # Map host port 5000 to container port 80 (Kestrel listens on 80 inside the container)
+    restart: unless-stopped # Restart policy to keep service running unless explicitly stopped
+
+# Define named volumes used by services. The `sqlserver` service references the
+# named volume `sqlserver-data` so it must be declared here. Using `driver: local`
+# will store data on the local Docker host (default behavior).
+volumes:
+  sqlserver-data:
+    driver: local

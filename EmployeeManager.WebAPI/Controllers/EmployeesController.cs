@@ -5,6 +5,7 @@ using EmployeeManager.Entity.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using EmployeeManager.Common.ResourceUtils;
 
 namespace EmployeeManager.WebAPI.Controllers
 {
@@ -28,33 +29,53 @@ namespace EmployeeManager.WebAPI.Controllers
         [HttpGet("employees")]
         public IActionResult GetEmployees()
         {
-            _logger.LogInformation("Getting all employees");
-            EmployeeModel[] employees = _automapper.Map<EmployeeModel[]>(_employeeService.GetEmployees());
-            return Ok(employees);
+            try
+            {
+                _logger.LogInformation("Getting all employees");
+                EmployeeModel[] employees = _automapper.Map<EmployeeModel[]>(_employeeService.GetEmployees());
+                return Ok(employees);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while getting all employees");
+                return BadRequest(ex.Message);
+            }
         }
 
         [Authorize]
         [HttpGet("employee")]
         public IActionResult GetEmployee([FromQuery] long id)
         {
-            EmployeeModel employee = _automapper.Map<EmployeeModel>(_employeeService.GetEmployee(id));
-
-            return Ok(employee);
+            try
+            {
+                EmployeeModel employee = _automapper.Map<EmployeeModel>(_employeeService.GetEmployee(id));
+                return Ok(employee);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [Authorize(Roles = "ADMIN, HR")]
         [HttpPost]
         public IActionResult Insert([FromBody]Employee? employee)
         {
-            if(employee == null)
+            try
             {
-                throw new ArgumentNullException(nameof(employee));
-            }
-            else
-            {
-                _employeeService.InsertEmployee(employee);
+                if (employee == null)
+                {
+                    throw new ArgumentNullException(nameof(employee));
+                }
+                else
+                {
+                    _employeeService.InsertEmployee(employee);
 
-                return Ok("New employee has been added");
+                    return Ok(Message.RES0001);
+                }
+            }
+            catch (Exception ex) { 
+                return BadRequest(ex.Message);
             }
             
         }
@@ -63,25 +84,38 @@ namespace EmployeeManager.WebAPI.Controllers
         [HttpPut]
         public IActionResult Update([FromBody] Employee? employee)
         {
-            if(employee == null)
+            try
             {
-                throw new ArgumentNullException(nameof(employee));
+                if (employee == null)
+                {
+                    throw new ArgumentNullException(nameof(employee));
+                }
+                else
+                {
+                    long id = employee.Id;
+                    _employeeService.UpdateEmployee(employee, id);
+                    return Ok(string.Format(Message.RES0002, id));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                long id = employee.Id;
-                _employeeService.UpdateEmployee(employee, id);
-                return Ok($"Update employee {id} successfully");
+                return BadRequest(ex.Message);
             }
+
         }
 
         [Authorize(Roles = "ADMIN")]
         [HttpDelete]
         public IActionResult Delete([FromQuery]long id)
         {
-            _employeeService.DeleteEmployee(id);
-
-            return Ok($"Employee with id {id} is deleted");
+            try
+            {
+                _employeeService.DeleteEmployee(id);
+                return Ok(string.Format(Message.RES0003, id));
+            }
+            catch (Exception ex) { 
+                return BadRequest(ex.Message);
+            }
         }
 
     }

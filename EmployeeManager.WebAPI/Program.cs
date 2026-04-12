@@ -18,6 +18,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Always use Authentication before Authorization, otherwise the user will not be authenticated and the authorization will fail
 app.UseAuthentication();
 app.UseAuthorization();
 
