@@ -1,0 +1,70 @@
+{
+    "family": "employee-manager-task-definition",
+    "containerDefinitions": [
+        {
+            "name": "web-api",
+            "image": "478913679202.dkr.ecr.ap-southeast-1.amazonaws.com/employee_manager_webapi@sha256:4efe3ca58889cafb33750424f928309c15b91b8e443217a1cc0d8d208e8ab8f7",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 80,
+                    "hostPort": 80,
+                    "protocol": "tcp",
+                    "name": "web-api-80-tcp",
+                    "appProtocol": "http"
+                },
+                {
+                    "containerPort": 443,
+                    "hostPort": 443,
+                    "protocol": "tcp",
+                    "name": "web-api-443-tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "ASPNETCORE_ENVIRONMENT",
+                    "value": "Development"
+                },
+                {
+                    "name": "JsonWebToken__SecretKey",
+                    "value": "This-Is-My-Local-Secret-Key-1234567890"
+                },
+                {
+                    "name": "ConnectionStrings__DefaultConnection",
+                    "value": "Server=172.31.36.157,1433;Database=EmployeeManagerDb;User Id=sa;Password=Your_strong_P@ssw0rd;TrustServerCertificate=True;"
+                }
+            ],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "ulimits": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/employee-manager-task-definition",
+                    "awslogs-create-group": "true",
+                    "awslogs-region": "ap-southeast-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            },
+            "systemControls": []
+        }
+    ],
+    "executionRoleArn": "arn:aws:iam::478913679202:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "volumes": [],
+    "placementConstraints": [],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "2048",
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    },
+    "enableFaultInjection": false
+}
